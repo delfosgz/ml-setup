@@ -1,0 +1,26 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments and cache
+.venv/
+__pycache__/
+.DS_Store
+
+# Data files
+*.csv
+*.parquet
+*.json
+data/raw/*
+data/interim/*
+data/processed/*
+!data/**/.gitkeep
+
+# Local models and configurations
+*.pkl
+*.model
+.env
