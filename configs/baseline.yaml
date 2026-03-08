@@ -1,0 +1,81 @@
+experiment_name: 'spaceship-titanic-baseline'
+random_seed: 42
+target: 'Transported'
+
+paths:
+  raw:       'data/raw'
+  interim:   'data/interim'
+  processed: 'data/processed'
+  reports:   'reports'
+
+split:
+  val_size: 0.20
+  stratify: true
+
+# ── Structural null decisions (applied in src/data/make_dataset.py) ──────────
+null_handling:
+  drop_column_threshold: 0.60   # Drop column if null ratio > threshold
+  drop_row_threshold:    0.50   # Drop row (train only) if null ratio > threshold
+
+# ── Feature definitions (post structural processing) ─────────────────────────
+features:
+  # Columns to drop before pipeline (already decomposed or irrelevant)
+  drop_cols:
+    - group_id    # identifier, not predictive on its own
+
+  numerical_cols:
+    - Age
+    - RoomService
+    - FoodCourt
+    - ShoppingMall
+    - Spa
+    - VRDeck
+    - total_spend    # engineered inside pipeline
+    - group_size
+    - cabin_num
+
+  categorical_cols:
+    - HomePlanet
+    - CryoSleep
+    - Destination
+    - VIP
+    - cabin_deck
+    - cabin_side
+
+  # Encoding strategy for categorical features
+  # Options: 'ordinal' | 'onehot' | 'target'
+  encoding: 'ordinal'
+
+  # Imputation strategy for numerical features
+  # Options: 'median' | 'mean' | 'constant'
+  numerical_imputer: 'median'
+  numerical_fill_value: 0        # Only used if strategy is 'constant'
+
+  # Imputation strategy for categorical features
+  # Options: 'most_frequent' | 'constant'
+  categorical_imputer: 'most_frequent'
+  categorical_fill_value: 'missing'  # Only used if strategy is 'constant'
+
+# ── RFE — toggle without changing code ───────────────────────────────────────
+rfe:
+  enabled: false                 # Set true to activate feature selection
+  n_features_to_select: 10
+  step: 1
+
+# ── Model hyperparameters ─────────────────────────────────────────────────────
+model:
+  name: 'XGBClassifier'
+  params:
+    n_estimators:        500
+    max_depth:           6
+    learning_rate:       0.05
+    subsample:           0.8
+    colsample_bytree:    0.8
+    min_child_weight:    3
+    gamma:               0.1
+    reg_alpha:           0.1
+    reg_lambda:          1.0
+    random_state:        42
+    eval_metric:         'logloss'
+    early_stopping_rounds: 50
+    tree_method:         'hist'
